@@ -15,7 +15,7 @@ MQTT_HOSTNAME = os.getenv("MQTT_HOSTNAME", "localhost")
 MQTT_PORT = int(os.getenv("MQTT_PORT", 1883))
 MQTT_TIMEOUT = int(os.getenv("MQTT_TIMEOUT", 10))
 MQTT_TOPIC = os.getenv("MQTT_TOPIC", 'home/raspberrypi/dht')
-MQTT_CLIENT_ID = os.getenv("MQTT_CLIENT_ID", "mqtt-raspberrypi")
+MQTT_CLIENT_ID = os.getenv("MQTT_CLIENT_ID", "raspberrypi-dht-to-mqtt")
 MQTT_CLEAN_SESSION = os.getenv("CLIENT_CLEAN_SESSION", False)
 MQTT_TLS_INSECURE = os.getenv("CLIENT_TLS_INSECURE", False)
 MQTT_CLIENT_QOS = int(os.getenv("CLIENT_QOS", 4))
@@ -73,7 +73,7 @@ if __name__ == '__main__':
     client.connect(MQTT_HOSTNAME, MQTT_PORT, MQTT_TIMEOUT)
 
     client.loop_start()
-    logging.info("Successfully initialized application! Let's try to read the sensor...")
+    logging.info("Successfully initialized application! Let's try to read the DHT sensor...")
 
     while True:
         try:
@@ -82,16 +82,16 @@ if __name__ == '__main__':
 
             if humidity is not None and temperature is not None:
 
-                logging.debug(f"Sensor values measured - temperature '{temperature}', humidity '{humidity}''")
+                logging.debug(f"DHT sensor values measured - temperature '{temperature}', humidity '{humidity}''")
                 data = {'temperature': round(temperature, DECIMAL_POINTS),
                         'humidity_percentage': round(humidity, DECIMAL_POINTS)}
 
-                logging.debug(f"Publishing data to topic - '{MQTT_TOPIC}'")
+                logging.debug(f"Publishing DHT data to topic - '{MQTT_TOPIC}'")
                 client.publish(MQTT_TOPIC, json.dumps(data))
             else:
-                logging.error(f"Failed to read sensor values. Check you wiring and configuration. Retrying in {SENSOR_CHECK_INTERVAL}...")
+                logging.error(f"Failed to read DHT sensor values. Check you wiring and configuration. Retrying in {SENSOR_CHECK_INTERVAL}...")
 
         except Exception as e:
-            logging.error(f"Something went wrong when trying to read the sensor and this shouldn't happen... Details: {e}")
+            logging.error(f"Something went wrong when trying to read the DHT sensor and this shouldn't happen... Details: {e}")
         finally:
             time.sleep(SENSOR_CHECK_INTERVAL)
